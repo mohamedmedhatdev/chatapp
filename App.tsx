@@ -1,54 +1,167 @@
-import { StatusBar } from "expo-status-bar";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { StyleSheet } from "react-native";
 import { BackgroundScreen } from "./src/screens/background/background.screen";
+import { Provider } from "react-redux";
+import { store } from "./src/store/store";
+import { ChatView } from "./src/components/chatView/chatView";
 
 export default function App() {
   return (
-    <BackgroundScreen>
-      <View style={{ height: 60 }}></View>
-      <ScrollView
-        style={{
-          flex: 1,
-          backgroundColor: "white",
-          borderTopEndRadius: 100,
-          borderTopLeftRadius: 50,
-          borderTopRightRadius: 50,
-          overflow: "hidden",
-        }}
-      >
-        <View
-          style={{
-            alignSelf: "flex-start",
-            overflow: "hidden",
-            maxWidth : "80%",
-            marginTop: 50,
-            borderTopLeftRadius : 0,
-            borderBottomLeftRadius : 0,
-            padding: 10,
-            borderRadius: 100,
-            backgroundColor : "rgba(200,200,200,1)"
+    <Provider store={store}>
+      <BackgroundScreen>
+        <ChatView
+          chat={{
+            chatId: 0,
+            recipiant: { id: 2, name: "Ahmed" },
+            messages: [
+              {
+                senderId: 1,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 1,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 1,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 1,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 1,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 1,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+              {
+                senderId: 2,
+                content: {
+                  type: "text",
+                  content: "THIS IS A MESSAGE",
+                },
+                timeStamp: new Date(),
+              },
+            ],
           }}
-        >
-          <Text >TEST ME sadasdekrjkwejrkwejrk[jksdfjkdsjfjsdkfjkdsfjksdkfjkdskfjkdsfjkdsfjNOW TEST ME NOW</Text>
-        </View>
-        <View
-          style={{
-            alignSelf: "flex-end",
-            overflow: "hidden",
-            maxWidth : "80%",
-            marginTop: 10,
-            borderTopRightRadius : 0,
-            borderBottomRightRadius : 0,
-            padding: 10,
-            borderRadius: 100,
-            backgroundColor : "rgba(200,200,200,1)"
-          }}
-        >
-          <Text >TEST ME sadasdekrjkwejrkwejrk[jksdfjkdsjfjsdkfjkdsfjksdkfjkdskfjkdsfjkdsfjNOW TEST ME NOW</Text>
-        </View>
-      </ScrollView>
-      <View style={{ height: 60 }}></View>
-    </BackgroundScreen>
+        />
+      </BackgroundScreen>
+    </Provider>
   );
 }
 

@@ -6,7 +6,7 @@ export type MessageContentType = {
     content : Blob;
 }
 export interface IMessage {
-    senderId : string;
+    senderId : number;
     content : MessageContentType;
     timeStamp: Date;
 }
