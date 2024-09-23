@@ -62,7 +62,7 @@ export const ChatView = ({ chat }: IChatViewProps) => {
         ))}
       </ScrollView>
       <Animated.View style={styles(colors).bottomBarContainer}>
-        <TextInput style={styles(colors).bottomBarText} />
+        <TextInput style={styles(colors).bottomBarText} placeholder="Write Your Message ..." placeholderTextColor={"grey"} />
         <TouchableOpacity style={styles(colors).sendButton}>
           <Ionicons name="attach-outline" size={20} color="white" />
         </TouchableOpacity>
