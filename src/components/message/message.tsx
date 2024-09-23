@@ -24,7 +24,7 @@ export const Message = ({ message }: IMessageProps) => {
       <Animated.View
         style={styles(isSender, colors).root}
         entering={
-          isSender ? FadeInRight.duration(150) : FadeInLeft.duration(150)
+         isSender ? FadeInRight.duration(150) : FadeInLeft.duration(150) 
         }
       >
         <Text style={{ color: colors.messageTextColor }}>

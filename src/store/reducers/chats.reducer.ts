@@ -3,6 +3,30 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { IChat } from "../../models/chat.model";
 import { IMessage } from "../../models/message.model";
 
+/* MOCKUP DATA */
+const mockupChat: IChat = {
+  chatId: 0,
+  recipiant: { id: 2, name: "Ahmed" },
+  messages: [
+    {
+      senderId: 1,
+      content: {
+        type: "text",
+        content: "THIS IS A MESS OTA 1 AGE",
+      },
+      timeStamp: new Date(),
+    },
+    {
+      senderId: 2,
+      content: {
+        type: "text",
+        content: "THIS IS A MESSAGE",
+      },
+      timeStamp: new Date(),
+    },
+  ],
+};
+
 interface ISendMessageAction {
   message: IMessage;
   chatId: number;
@@ -13,7 +37,7 @@ export interface ChatsState {
 }
 
 const initialState: ChatsState = {
-  chats: [{ chatId: 0, messages: [], recipiant: { id: 10, name: "Amir" } }],
+  chats: [mockupChat],
 };
 
 export const chatsSlice = createSlice({
