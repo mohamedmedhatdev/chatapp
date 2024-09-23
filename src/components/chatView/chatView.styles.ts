@@ -7,12 +7,16 @@ export const styles = (colors: IColorScheme) =>
       height: 100,
       justifyContent: "center",
       backgroundColor: colors.barsColor,
+      flexDirection: "row",
+      alignItems: "center",
+      paddingTop: 30,
     },
     topBarText: {
-      marginTop: 30,
       color: "white",
       fontSize: 24,
-      textAlign: "center",
+      marginRight: "auto",
+      width : "100%",
+      textAlign : "center"
     },
     bottomBarContainer: {
       height: 70,
@@ -22,7 +26,7 @@ export const styles = (colors: IColorScheme) =>
       justifyContent: "space-between",
     },
     bottomBarText: {
-      width: "80%",
+      width: "70%",
       backgroundColor: colors.inputColor,
       height: 40,
       borderRadius: 20,

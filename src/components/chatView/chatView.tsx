@@ -4,6 +4,7 @@ import {
   TextInput,
   Keyboard,
   TouchableOpacity,
+  ScrollView,
 } from "react-native";
 import { Message } from "../message/message";
 import { IChat } from "../../models/chat.model";
@@ -26,12 +27,7 @@ export const ChatView = ({ chat }: IChatViewProps) => {
   const keyboardAnimation = useAnimatedKeyboard();
   const colors = useSelector((state: RootState) => state.colorsReducer.colors);
   const chatViewStyle = useAnimatedStyle(() => {
-    return {
-      flex: 1,
-      padding : 10,
-      backgroundColor: colors.chatBackgroundColor,
-      overflow: "hidden",
-    };
+    return {};
   });
   const inputStyle = useAnimatedStyle(() => ({
     height: keyboardAnimation.height.value,
@@ -46,34 +42,31 @@ export const ChatView = ({ chat }: IChatViewProps) => {
   }, []);
   return (
     <>
-      <View
-        style={styles(colors).topBarContainer}
-      >
-        <Text
-          style={styles(colors).topBarText}
-        >
-          {chat.recipiant.name}
-        </Text>
+      <View style={styles(colors).topBarContainer}>
+        <Text style={styles(colors).topBarText}>{chat.recipiant.name}</Text>
       </View>
-      <Animated.ScrollView
+      <ScrollView
         showsVerticalScrollIndicator
-        style={chatViewStyle}
+        style={{
+          flex: 1,
+          backgroundColor: colors.chatBackgroundColor,
+          overflow: "hidden",
+          borderTopLeftRadius: 50,
+          borderTopRightRadius: 50,
+        }}
         ref={scrollViewRef}
       >
         <View style={{ marginTop: 35 }} />
         {chat.messages.map((x, i) => (
           <Message message={x} />
         ))}
-      </Animated.ScrollView>
-      <Animated.View
-        style={styles(colors).bottomBarContainer}
-      >
-        <TextInput
-        style={styles(colors).bottomBarText}
-        />
-        <TouchableOpacity
-        style={styles(colors).sendButton}
-        >
+      </ScrollView>
+      <Animated.View style={styles(colors).bottomBarContainer}>
+        <TextInput style={styles(colors).bottomBarText} />
+        <TouchableOpacity style={styles(colors).sendButton}>
+          <Ionicons name="attach-outline" size={20} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles(colors).sendButton}>
           <Ionicons name="send-outline" size={20} color="white" />
         </TouchableOpacity>
       </Animated.View>
