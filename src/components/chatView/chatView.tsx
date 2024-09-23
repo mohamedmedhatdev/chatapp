@@ -26,20 +26,22 @@ export const ChatView = ({ chat }: IChatViewProps) => {
   const scrollViewRef = useRef<Animated.ScrollView | null>(null);
   const keyboardAnimation = useAnimatedKeyboard();
   const colors = useSelector((state: RootState) => state.colorsReducer.colors);
-  const chatViewStyle = useAnimatedStyle(() => {
-    return {};
-  });
+
   const inputStyle = useAnimatedStyle(() => ({
     height: keyboardAnimation.height.value,
   }));
+
   useEffect(() => {
-    scrollViewRef.current?.scrollToEnd();
-  }, [chat]);
-  useEffect(() => {
+    // Reason for this empty use Effect is that this will need to be registerd once and only once as it's an event listener
     Keyboard.addListener("keyboardDidShow", () => {
       scrollViewRef.current?.scrollToEnd();
     });
   }, []);
+
+  useEffect(() => {
+    scrollViewRef.current?.scrollToEnd();
+  }, [chat]);
+
   return (
     <>
       <View style={styles(colors).topBarContainer}>
@@ -47,22 +49,19 @@ export const ChatView = ({ chat }: IChatViewProps) => {
       </View>
       <ScrollView
         showsVerticalScrollIndicator
-        style={{
-          flex: 1,
-          backgroundColor: colors.chatBackgroundColor,
-          overflow: "hidden",
-          borderTopLeftRadius: 50,
-          borderTopRightRadius: 50,
-        }}
+        style={styles(colors).messagesScrollView}
         ref={scrollViewRef}
       >
-        <View style={{ marginTop: 35 }} />
         {chat.messages.map((x, i) => (
-          <Message message={x} />
+          <Message key={i} message={x} />
         ))}
       </ScrollView>
       <Animated.View style={styles(colors).bottomBarContainer}>
-        <TextInput style={styles(colors).bottomBarText} placeholder="Write Your Message ..." placeholderTextColor={"grey"} />
+        <TextInput
+          style={styles(colors).bottomBarInput}
+          placeholder="Write Your Message ..."
+          placeholderTextColor={"grey"}
+        />
         <TouchableOpacity style={styles(colors).sendButton}>
           <Ionicons name="attach-outline" size={20} color="white" />
         </TouchableOpacity>
