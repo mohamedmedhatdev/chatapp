@@ -6,7 +6,7 @@ import {
   ScrollView,
 } from "react-native";
 import { Message } from "../message/message";
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Animated, {
   useAnimatedKeyboard,
   useAnimatedStyle,
@@ -19,6 +19,8 @@ import { chatsActions } from "../../store/reducers/chats.reducer";
 import { TextField } from "../form/inputField";
 import { useForm } from "react-hook-form";
 import { ChatTopBar } from "./topBar";
+import { MessageReplyPrompt } from "./messageReplyPrompt";
+import { IMessage } from "../../models/message.model";
 
 interface IChatViewProps {
   chatId: number;
@@ -40,6 +42,11 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
   const user = useSelector((state: RootState) => state.authReducer.user);
   const dispatch = useDispatch();
 
+  const [replyData, setReplyData] = useState<{
+    msg?: IMessage;
+    isReplying: boolean;
+  }>({ isReplying: false });
+
   const inputStyle = useAnimatedStyle(() => ({
     height: keyboardAnimation.height.value,
   }));
@@ -50,7 +57,7 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
       scrollViewRef.current?.scrollToEnd();
     });
     setInterval(() => {
-      sendMsg(false, "THIS IS A MOCKUP MESSAGE");
+      sendMsg(false, "New Message From OTA");
     }, 20000);
   }, []);
 
@@ -65,6 +72,7 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
         chatsActions.sendMessage({
           chatId,
           message: {
+            baseMsg: replyData.isReplying ? replyData.msg : undefined,
             senderId: isSender ? user.id : chat.recipiant.id,
             content: {
               type: "text",
@@ -78,14 +86,17 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
       if (!customMsg) {
         form.setValue("msg", "");
       }
+      if (isSender) {
+        setReplyData({ isReplying: false, msg: undefined });
+      }
     },
-    [chatId, user, form]
+    [chatId, user, form, replyData]
   );
 
   return (
     <>
       <ChatTopBar form={form} chat={chat} />
-      <ScrollView
+      <Animated.ScrollView
         showsVerticalScrollIndicator
         style={styles(colors).messagesScrollView}
         ref={scrollViewRef}
@@ -98,11 +109,27 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
             return true;
           })
           .map((x, i) => (
-            <Message key={i} message={x} />
+            <Message
+              key={i}
+              message={x}
+              chat={chat}
+              onReply={() => {
+                setReplyData({ isReplying: true, msg: x });
+              }}
+            />
           ))}
         {/* This View is to make sure that there is some space in the end of the chat */}
         <View style={{ height: 50 }} />
-      </ScrollView>
+      </Animated.ScrollView>
+      {replyData.isReplying && (
+        <MessageReplyPrompt
+          message={replyData.msg!}
+          chat={chat}
+          onClose={() => {
+            setReplyData({ msg: undefined, isReplying: false });
+          }}
+        />
+      )}
       <Animated.View style={styles(colors).bottomBarContainer}>
         <TextField
           control={form.control}

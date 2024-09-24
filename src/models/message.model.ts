@@ -8,5 +8,6 @@ export type MessageContentType = {
 export interface IMessage {
     senderId : number;
     content : MessageContentType;
+    baseMsg? : IMessage;
     timeStamp: string;
 }

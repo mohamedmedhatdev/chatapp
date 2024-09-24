@@ -23,7 +23,6 @@ export const ChatTopBar = ({ chat, form }: IChatTopBarProps) => {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          width: "30%",
         }}
       >
         <Ionicons
@@ -74,6 +73,8 @@ export const ChatTopBar = ({ chat, form }: IChatTopBarProps) => {
               color: "white",
               padding: 10,
             }}
+            placeholder="Type something to search for..."
+            placeholderTextColor={"gray"}
             control={form.control}
             name="search"
           />
