@@ -1,14 +1,12 @@
 import {
   View,
   Text,
-  TextInput,
   Keyboard,
   TouchableOpacity,
   ScrollView,
 } from "react-native";
 import { Message } from "../message/message";
-import { IChat } from "../../models/chat.model";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import Animated, {
   useAnimatedKeyboard,
   useAnimatedStyle,
@@ -20,6 +18,7 @@ import { styles } from "./chatView.styles";
 import { chatsActions } from "../../store/reducers/chats.reducer";
 import { TextField } from "../form/inputField";
 import { useForm } from "react-hook-form";
+import { ChatTopBar } from "./topBar";
 
 interface IChatViewProps {
   chatId: number;
@@ -28,62 +27,81 @@ interface IChatViewProps {
 export const ChatView = ({ chatId }: IChatViewProps) => {
   const scrollViewRef = useRef<Animated.ScrollView | null>(null);
   const keyboardAnimation = useAnimatedKeyboard();
-  const form = useForm<{ msg: string }>();
+  const form = useForm<{ msg: string; search: string }>({
+    defaultValues: { search: "" },
+  });
+  const searchInputValue = form.watch("search");
+
   /* REDUX DATA CALLS */
   const colors = useSelector((state: RootState) => state.colorsReducer.colors);
   const chat = useSelector(
     (state: RootState) => state.chatsReducer.chats[chatId]
   );
   const user = useSelector((state: RootState) => state.authReducer.user);
+  const dispatch = useDispatch();
 
   const inputStyle = useAnimatedStyle(() => ({
     height: keyboardAnimation.height.value,
   }));
-
-  const dispatch = useDispatch();
 
   useEffect(() => {
     // Reason for this empty use Effect is that this will need to be registerd once and only once as it's an event listener
     Keyboard.addListener("keyboardDidShow", () => {
       scrollViewRef.current?.scrollToEnd();
     });
+    setInterval(() => {
+      sendMsg(false, "THIS IS A MOCKUP MESSAGE");
+    }, 20000);
   }, []);
 
   useEffect(() => {
-    // this timeout is to make sure that the new messages have been already rendered 
-    setTimeout(() => scrollViewRef.current?.scrollToEnd(),100);
+    // this timeout is to make sure that the new messages have been already rendered
+    setTimeout(() => scrollViewRef.current?.scrollToEnd(), 100);
   }, [chat]);
 
-  const sendMsg = useCallback(() => {
-    dispatch(
-      chatsActions.sendMessage({
-        chatId,
-        message: {
-          senderId: user.id,
-          content: {
-            type: "text",
-            content: form.getValues().msg,
+  const sendMsg = useCallback(
+    (isSender: boolean, customMsg?: string) => {
+      dispatch(
+        chatsActions.sendMessage({
+          chatId,
+          message: {
+            senderId: isSender ? user.id : chat.recipiant.id,
+            content: {
+              type: "text",
+              content:
+                !isSender && customMsg ? customMsg : form.getValues().msg,
+            },
+            timeStamp: new Date().toLocaleDateString("en-us"),
           },
-          timeStamp: new Date(),
-        },
-      })
-    );
-    form.setValue("msg","");
-  }, [chatId,user,form]);
+        })
+      );
+      if (!customMsg) {
+        form.setValue("msg", "");
+      }
+    },
+    [chatId, user, form]
+  );
 
   return (
     <>
-      <View style={styles(colors).topBarContainer}>
-        <Text style={styles(colors).topBarText}>{chat.recipiant.name}</Text>
-      </View>
+      <ChatTopBar form={form} chat={chat} />
       <ScrollView
         showsVerticalScrollIndicator
         style={styles(colors).messagesScrollView}
         ref={scrollViewRef}
       >
-        {chat.messages.map((x, i) => (
-          <Message key={i} message={x} />
-        ))}
+        {chat.messages
+          .filter((x) => {
+            if (searchInputValue.trim().length > 0) {
+              return x.content.content.toString().includes(searchInputValue);
+            }
+            return true;
+          })
+          .map((x, i) => (
+            <Message key={i} message={x} />
+          ))}
+        {/* This View is to make sure that there is some space in the end of the chat */}
+        <View style={{ height: 50 }} />
       </ScrollView>
       <Animated.View style={styles(colors).bottomBarContainer}>
         <TextField
@@ -92,13 +110,20 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
           style={styles(colors).bottomBarInput}
           placeholder="Write Your Message ..."
           placeholderTextColor={"grey"}
-          onSubmitEditing={() => {sendMsg();}}
+          onSubmitEditing={() => {
+            sendMsg(true);
+          }}
           returnKeyType="send"
         />
         <TouchableOpacity style={styles(colors).sendButton}>
           <Ionicons name="attach-outline" size={20} color="white" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles(colors).sendButton} onPress={() => {sendMsg()}}>
+        <TouchableOpacity
+          style={styles(colors).sendButton}
+          onPress={() => {
+            sendMsg(true);
+          }}
+        >
           <Ionicons name="send-outline" size={20} color="white" />
         </TouchableOpacity>
       </Animated.View>

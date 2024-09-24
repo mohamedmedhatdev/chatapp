@@ -8,12 +8,10 @@ export const styles = (isSender: boolean, colors: IColorScheme) =>
       overflow: "hidden",
       maxWidth: "80%",
       marginTop: 10,
-      borderTopLeftRadius: isSender ? 100 : 0,
-      borderBottomLeftRadius: isSender ? 100 : 0,
-      borderTopRightRadius: isSender ? 0 : 100,
-      borderBottomRightRadius: isSender ? 0 : 100,
       padding: 13,
-      borderRadius: 100,
+      borderRadius: 15,
+      borderBottomRightRadius: isSender ? 0 : 15,
+      borderBottomLeftRadius: !isSender ? 0 : 15,
       backgroundColor: isSender
         ? colors.senderMessageColor
         : colors.recepientMessageColor,

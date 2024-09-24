@@ -14,7 +14,7 @@ const mockupChat: IChat = {
         type: "text",
         content: "THIS IS A MESS OTA 1 AGE",
       },
-      timeStamp: new Date(),
+      timeStamp: new Date().toLocaleDateString("en-us"),
     },
     {
       senderId: 2,
@@ -22,7 +22,7 @@ const mockupChat: IChat = {
         type: "text",
         content: "THIS IS A MESSAGE",
       },
-      timeStamp: new Date(),
+      timeStamp: new Date().toLocaleDateString("en-us"),
     },
   ],
 };

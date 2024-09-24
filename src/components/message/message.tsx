@@ -32,7 +32,7 @@ export const Message = ({ message }: IMessageProps) => {
         </Text>
 
         <Text style={styles(isSender, colors).timeStamp}>
-          {message.timeStamp.toLocaleDateString("en-us")}
+          {message.timeStamp}
         </Text>
       </Animated.View>
     </>

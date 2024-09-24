@@ -5,25 +5,21 @@ export const styles = (colors: IColorScheme) =>
   StyleSheet.create({
     messagesScrollView: {
       flex: 1,
+      padding: 20,
       backgroundColor: colors.chatBackgroundColor,
       overflow: "hidden",
-      borderTopLeftRadius: 50,
-      borderTopRightRadius: 50,
     },
     topBarContainer: {
       height: 100,
-      justifyContent: "center",
       backgroundColor: colors.barsColor,
       flexDirection: "row",
       alignItems: "center",
+      justifyContent: "space-between",
       paddingTop: 30,
     },
     topBarText: {
       color: "white",
       fontSize: 24,
-      marginRight: "auto",
-      width: "100%",
-      textAlign: "center",
     },
     bottomBarContainer: {
       height: 70,
