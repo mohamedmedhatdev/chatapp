@@ -31,7 +31,9 @@ export const ChatTopBar = ({ chat, form }: IChatTopBarProps) => {
           color="white"
           style={{ marginLeft: 10 }}
         />
-        <Text style={styles(colors).topBarText}>{chat.recipiant.name}</Text>
+        {!showSearch && (
+          <Text style={styles(colors).topBarText}>{chat.recipiant.name}</Text>
+        )}
       </View>
       {!showSearch && (
         <Animated.View
@@ -59,7 +61,6 @@ export const ChatTopBar = ({ chat, form }: IChatTopBarProps) => {
           style={{
             width: "100%",
             alignItems: "center",
-            marginLeft: 50,
             flexDirection: "row",
             justifyContent: "flex-start",
           }}
@@ -67,7 +68,7 @@ export const ChatTopBar = ({ chat, form }: IChatTopBarProps) => {
           <TextField
             style={{
               backgroundColor: colors.inputColor,
-              width: "50%",
+              width: "80%",
               height: 40,
               borderRadius: 10,
               color: "white",

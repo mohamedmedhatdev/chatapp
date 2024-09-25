@@ -9,6 +9,7 @@ const mockupChat: IChat = {
   recipiant: { id: 2, name: "Ahmed" },
   messages: [
     {
+      id: 0,
       senderId: 1,
       content: {
         type: "text",
@@ -17,6 +18,7 @@ const mockupChat: IChat = {
       timeStamp: new Date().toLocaleDateString("en-us"),
     },
     {
+      id: 1,
       senderId: 2,
       content: {
         type: "text",
@@ -28,7 +30,7 @@ const mockupChat: IChat = {
 };
 
 interface ISendMessageAction {
-  message: IMessage;
+  message: Omit<IMessage, "id">;
   chatId: number;
 }
 
@@ -44,10 +46,33 @@ export const chatsSlice = createSlice({
   name: "chats",
   initialState,
   reducers: {
+    switchMessageLike(
+      state,
+      action: PayloadAction<{ chatId: number; msgId: number }>
+    ) {
+      state.chats = state.chats.map((x) =>
+        x.chatId === action.payload.chatId
+          ? {
+              ...x,
+              messages: x.messages.map((y) =>
+                y.id === action.payload.msgId
+                  ? { ...y, isLiked: !y.isLiked }
+                  : y
+              ),
+            }
+          : x
+      );
+    },
     sendMessage(state, action: PayloadAction<ISendMessageAction>) {
       state.chats = state.chats.map((x) =>
         x.chatId === action.payload.chatId
-          ? { ...x, messages: [...x.messages, action.payload.message] }
+          ? {
+              ...x,
+              messages: [
+                ...x.messages,
+                { ...action.payload.message, id: x.messages.length },
+              ],
+            }
           : x
       );
     },

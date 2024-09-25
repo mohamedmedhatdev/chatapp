@@ -68,6 +68,7 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
 
   const sendMsg = useCallback(
     (isSender: boolean, customMsg?: string) => {
+      console.log(replyData.isReplying);
       dispatch(
         chatsActions.sendMessage({
           chatId,

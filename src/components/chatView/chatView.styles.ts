@@ -20,6 +20,7 @@ export const styles = (colors: IColorScheme) =>
     topBarText: {
       color: "white",
       fontSize: 24,
+      marginLeft: 20,
     },
     bottomBarContainer: {
       height: 70,
