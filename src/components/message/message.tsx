@@ -43,7 +43,7 @@ export const Message = ({ message, onReply, chat }: IMessageProps) => {
     );
   };
   const doubleTapGesture = Gesture.Tap()
-    .maxDuration(150)
+    .maxDuration(300)
     .numberOfTaps(2)
     .onStart(() => {
       runOnJS(likeMessage)();
