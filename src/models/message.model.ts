@@ -4,12 +4,14 @@ export type MessageContentType =
       content: string;
     }
   | {
-      type: "image";
+      type: "file";
+      fileName: string;
       content: Blob;
+      uri: string;
     };
 export interface IMessage {
   senderId: number;
-  id : number;
+  id: number;
   content: MessageContentType;
   baseMsg?: IMessage;
   timeStamp: string;

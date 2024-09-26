@@ -20,6 +20,7 @@ import { TextField } from "../form/inputField";
 import { useForm } from "react-hook-form";
 import { ChatTopBar } from "./topBar";
 import { MessageReplyPrompt } from "./messageReplyPrompt";
+import * as DocumentPicker from "expo-document-picker";
 import { IMessage } from "../../models/message.model";
 
 interface IChatViewProps {
@@ -56,9 +57,7 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
     Keyboard.addListener("keyboardDidShow", () => {
       scrollViewRef.current?.scrollToEnd();
     });
-    setInterval(() => {
-      sendMsg(false, "New Message From OTA");
-    }, 20000);
+    sendMsg(false, "New Message From OTA");
   }, []);
 
   useEffect(() => {
@@ -143,8 +142,30 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
           }}
           returnKeyType="send"
         />
-        <TouchableOpacity style={styles(colors).sendButton}>
-          <Ionicons name="attach-outline" size={20} color="white" />
+        <TouchableOpacity
+          style={styles(colors).sendButton}
+          onPress={async () => {
+            let result = await DocumentPicker.getDocumentAsync();
+            const data = await fetch(result?.assets![0].uri);
+            dispatch(
+              chatsActions.sendMessage({
+                chatId,
+                message: {
+                  baseMsg: replyData.isReplying ? replyData.msg : undefined,
+                  senderId: user.id,
+                  content: {
+                    uri: result.assets![0].uri,
+                    type: "file",
+                    fileName: result.assets![0].name,
+                    content: await data.blob(),
+                  },
+                  timeStamp: new Date().toLocaleDateString("en-us"),
+                },
+              })
+            );
+          }}
+        >
+          <Ionicons name="camera-outline" size={20} color="white" />
         </TouchableOpacity>
         <TouchableOpacity
           style={styles(colors).sendButton}

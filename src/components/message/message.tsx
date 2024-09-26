@@ -1,10 +1,11 @@
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useMemo } from "react";
 import { styles } from "./message.style";
 import { IMessage } from "../../models/message.model";
 import { RootState } from "../../store/store";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import * as Sharing from "expo-sharing";
 
 import Animated, {
   BounceIn,
@@ -105,9 +106,32 @@ export const Message = ({ message, onReply, chat }: IMessageProps) => {
             </Text>
           </View>
         )}
-        <Text style={{ color: colors.messageTextColor }}>
-          {message.content.content.toString()}
-        </Text>
+
+        {message.content.type === "text" && (
+          <Text style={{ color: colors.messageTextColor }}>
+            {message.content.content.toString()}
+          </Text>
+        )}
+        {message.content.type === "file" && (
+          <TouchableOpacity
+            onPress={() => {
+              Sharing.shareAsync((message.content as any).uri);
+            }}
+            style={{
+              width: "100%",
+              height: 60,
+              backgroundColor: colors.inputColor,
+              borderRadius: 10,
+              flexDirection: "row",
+              padding: 10,
+            }}
+          >
+            <Ionicons name="file-tray" size={32} color="white" />
+            <Text style={{ color: "white", fontSize: 24, marginHorizontal: 5 }}>
+              {message.content.fileName}
+            </Text>
+          </TouchableOpacity>
+        )}
 
         <Text style={styles(isSender, colors).timeStamp}>
           {message.timeStamp}
