@@ -15,5 +15,5 @@ export interface IMessage {
   content: MessageContentType;
   baseMsg?: IMessage;
   timeStamp: string;
-  isLiked?: boolean;
+  reaction?: string;
 }

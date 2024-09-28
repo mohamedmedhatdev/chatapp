@@ -1,6 +1,13 @@
-import { Text, TouchableOpacity, View } from "react-native";
+import {
+  LayoutChangeEvent,
+  LayoutRectangle,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewProps,
+} from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { useMemo } from "react";
+import { Component, forwardRef, useMemo, useRef, useState } from "react";
 import { styles } from "./message.style";
 import { IMessage } from "../../models/message.model";
 import { RootState } from "../../store/store";
@@ -8,25 +15,44 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Sharing from "expo-sharing";
 
 import Animated, {
+  AnimateProps,
   BounceIn,
   BounceOut,
+  FadeIn,
   FadeInLeft,
   FadeInRight,
+  FadeOut,
+  measure,
   runOnJS,
+  runOnUI,
+  useAnimatedRef,
   useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
 import { IChat } from "../../models/chat.model";
 import { Ionicons } from "@expo/vector-icons";
 import { chatsActions } from "../../store/reducers/chats.reducer";
+import { ReactionsBar } from "./reactionsBar";
 
 interface IMessageProps {
   message: IMessage;
   onReply: () => void;
+  onReact: (lr: LayoutRectangle) => void;
+  onHideReact: () => void;
+  customWidth?: number;
   chat: IChat;
+  showReaction?: boolean;
 }
 const END_POSITION = 80;
-export const Message = ({ message, onReply, chat }: IMessageProps) => {
+export const Message = ({
+  message,
+  onReply,
+  chat,
+  onReact,
+  customWidth,
+  showReaction,
+  onHideReact,
+}: IMessageProps) => {
   const authState = useSelector((state: RootState) => state.authReducer);
   const dispatch = useDispatch();
   const isSender = useMemo(
@@ -34,21 +60,19 @@ export const Message = ({ message, onReply, chat }: IMessageProps) => {
     [message.senderId, authState.user.id]
   );
   const colors = useSelector((state: RootState) => state.colorsReducer.colors);
+  const ref = useAnimatedRef();
   const position = useSharedValue(0);
-  const likeMessage = () => {
+  const reactToMessage = (reaction: string) => {
     dispatch(
-      chatsActions.switchMessageLike({
+      chatsActions.setReaction({
         chatId: chat.chatId,
         msgId: message.id,
+        reaction,
       })
     );
   };
-  const doubleTapGesture = Gesture.Tap()
-    .maxDuration(300)
-    .numberOfTaps(2)
-    .onStart(() => {
-      runOnJS(likeMessage)();
-    });
+  const layout = useSharedValue<LayoutRectangle | undefined>(undefined);
+
   const panGesture = Gesture.Pan()
     .onUpdate((e) => {
       if (isSender) {
@@ -65,19 +89,52 @@ export const Message = ({ message, onReply, chat }: IMessageProps) => {
         if (e.translationX > END_POSITION) runOnJS(onReply)();
       }
     });
+  const longPressGesture = Gesture.LongPress()
+    .runOnJS(true)
+    .onStart(() => {
+      if (layout.value) onReact(layout.value);
+    });
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: position.value }],
   }));
 
   return (
-    <GestureDetector gesture={Gesture.Exclusive(panGesture, doubleTapGesture)}>
+    <GestureDetector
+      gesture={Gesture.Race(longPressGesture, Gesture.Exclusive(panGesture))}
+    >
       <Animated.View
-        style={[styles(isSender, colors).root, animatedStyle]}
+        onLayout={(e) => {
+          runOnUI(() => {
+            let res = measure(ref);
+            console.log(res);
+            if (res)
+              layout.value = {
+                width: res?.width,
+                height: res?.height,
+                x: res?.pageX,
+                y: res?.pageY,
+              };
+          })();
+        }}
+        ref={ref}
+        style={[
+          styles(isSender, colors).root,
+          animatedStyle,
+          ...(customWidth ? [{ minWidth: customWidth }] : []),
+        ]}
         entering={
           isSender ? FadeInRight.duration(150) : FadeInLeft.duration(150)
         }
       >
+        {showReaction && (
+          <ReactionsBar
+            onReact={(r) => {
+              reactToMessage(r);
+              onHideReact();
+            }}
+          />
+        )}
         {message.baseMsg && (
           <View
             style={{
@@ -136,7 +193,7 @@ export const Message = ({ message, onReply, chat }: IMessageProps) => {
         <Text style={styles(isSender, colors).timeStamp}>
           {message.timeStamp}
         </Text>
-        {message.isLiked && (
+        {message.reaction && (
           <Animated.View
             entering={BounceIn.duration(300)}
             exiting={BounceOut.duration(300)}
@@ -148,11 +205,12 @@ export const Message = ({ message, onReply, chat }: IMessageProps) => {
               alignItems: "center",
               justifyContent: "center",
               borderRadius: 20,
+              zIndex: 10,
               bottom: -20,
               [isSender ? "left" : "right"]: -20,
             }}
           >
-            <Ionicons name="heart" size={13} color="red" />
+            <Text>{message.reaction}</Text>
           </Animated.View>
         )}
       </Animated.View>

@@ -1,9 +1,13 @@
 import {
   View,
-  Text,
   Keyboard,
   TouchableOpacity,
-  ScrollView,
+  StyleSheet,
+  LayoutChangeEvent,
+  TurboModuleRegistry,
+  TouchableWithoutFeedback,
+  Touchable,
+  LayoutRectangle,
 } from "react-native";
 import { Message } from "../message/message";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -22,6 +26,7 @@ import { ChatTopBar } from "./topBar";
 import { MessageReplyPrompt } from "./messageReplyPrompt";
 import * as DocumentPicker from "expo-document-picker";
 import { IMessage } from "../../models/message.model";
+import { BlurView } from "expo-blur";
 
 interface IChatViewProps {
   chatId: number;
@@ -34,6 +39,7 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
     defaultValues: { search: "" },
   });
   const searchInputValue = form.watch("search");
+  const messagesRefs = useRef<View[]>([]);
 
   /* REDUX DATA CALLS */
   const colors = useSelector((state: RootState) => state.colorsReducer.colors);
@@ -47,6 +53,12 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
     msg?: IMessage;
     isReplying: boolean;
   }>({ isReplying: false });
+
+  const [reactData, setReactData] = useState<{
+    msgId: number;
+    react: boolean;
+    layout?: LayoutRectangle;
+  }>({ msgId: 0, react: false });
 
   const inputStyle = useAnimatedStyle(() => ({
     height: keyboardAnimation.height.value,
@@ -67,7 +79,6 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
 
   const sendMsg = useCallback(
     (isSender: boolean, customMsg?: string) => {
-      console.log(replyData.isReplying);
       dispatch(
         chatsActions.sendMessage({
           chatId,
@@ -95,6 +106,35 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
 
   return (
     <>
+      {reactData.react && reactData.layout && (
+        <>
+          <BlurView
+            onTouchStart={() => {
+              setReactData((r) => ({ ...r, react: false }));
+            }}
+            style={styles(colors).blurContainer}
+          />
+          <View
+            style={{
+              position : "absolute",
+              zIndex : 10,
+              top : reactData.layout.y,
+              padding : 20,
+              width : "100%" 
+            }}
+          >
+            <Message 
+            chat={chat}
+            showReaction
+            onHideReact={() => {setReactData((x) => ({...x,react : false}))}}
+            message={chat.messages.find((x) => x.id === reactData.msgId) ?? chat.messages[0]}
+            onReply={() => {}}
+            onReact={() => {}}
+            />
+          </View>
+        </>
+      )}
+
       <ChatTopBar form={form} chat={chat} />
       <Animated.ScrollView
         showsVerticalScrollIndicator
@@ -110,6 +150,10 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
           })
           .map((x, i) => (
             <Message
+              onReact={(layout) => {
+                console.log(layout);
+                setReactData({ msgId: x.id, react: true, layout });
+              }}
               key={i}
               message={x}
               chat={chat}
@@ -130,7 +174,11 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
           }}
         />
       )}
-      <Animated.View style={styles(colors).bottomBarContainer}>
+      <BlurView
+        intensity={100}
+        tint={"dark"}
+        style={styles(colors).bottomBarContainer}
+      >
         <TextField
           control={form.control}
           name="msg"
@@ -147,6 +195,7 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
           onPress={async () => {
             let result = await DocumentPicker.getDocumentAsync();
             const data = await fetch(result?.assets![0].uri);
+            // Send/Upload Attachment
             dispatch(
               chatsActions.sendMessage({
                 chatId,
@@ -169,13 +218,13 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles(colors).sendButton}
-          onPress={() => {
+          onPress={async () => {
             sendMsg(true);
           }}
         >
           <Ionicons name="send-outline" size={20} color="white" />
         </TouchableOpacity>
-      </Animated.View>
+      </BlurView>
       <Animated.View style={inputStyle} />
     </>
   );

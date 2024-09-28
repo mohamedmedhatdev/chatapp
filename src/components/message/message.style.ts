@@ -9,7 +9,6 @@ export const styles = (isSender: boolean, colors: IColorScheme) =>
       overflow : "visible",
       marginTop: 10,
       padding: 13,
-      position: "relative",
       borderRadius: 15,
       borderBottomRightRadius: isSender ? 0 : 15,
       borderBottomLeftRadius: !isSender ? 0 : 15,

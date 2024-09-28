@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
+import { styles } from "./messageReplyPrompt.style";
 
 interface IMessageReplyPrompt {
   message: IMessage;
@@ -26,40 +27,19 @@ export const MessageReplyPrompt = ({
   const colors = useSelector((state: RootState) => state.colorsReducer.colors);
   return (
     <Animated.View
-      style={{ minHeight: 50, flexDirection: "row", alignItems: "center" }}
+      style={styles(colors).animatedView}
       entering={FadeInRight.duration(300)}
       exiting={FadeInLeft.duration(300)}
     >
-      <View
-        style={{
-          borderLeftWidth: 5,
-          borderLeftColor: "yellow",
-          flex: 1,
-          justifyContent: "center",
-        }}
-      >
-        <Text
-          style={{
-            paddingLeft: 10,
-            color: "yellow",
-            fontWeight: "bold",
-          }}
-        >
+      <View style={styles(colors).viewContainer}>
+        <Text style={styles(colors).nameTitle}>
           {userId === message.senderId ? "YOU" : chat.recipiant.name}
         </Text>
-        <Text style={{ color: "white", paddingLeft: 10 }}>
+        <Text style={styles(colors).message}>
           {message.content.content.toString() ?? ""}
         </Text>
       </View>
-      <TouchableOpacity
-        style={{
-          backgroundColor: colors.accentColor,
-          padding: 5,
-          borderRadius: 100,
-          marginRight: 10,
-        }}
-        onPress={onClose}
-      >
+      <TouchableOpacity style={styles(colors).closeButton} onPress={onClose}>
         <Ionicons name="close" size={25} color="white" />
       </TouchableOpacity>
     </Animated.View>

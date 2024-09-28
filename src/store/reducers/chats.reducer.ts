@@ -46,9 +46,9 @@ export const chatsSlice = createSlice({
   name: "chats",
   initialState,
   reducers: {
-    switchMessageLike(
+    setReaction(
       state,
-      action: PayloadAction<{ chatId: number; msgId: number }>
+      action: PayloadAction<{ chatId: number; msgId: number,reaction: string }>
     ) {
       state.chats = state.chats.map((x) =>
         x.chatId === action.payload.chatId
@@ -56,7 +56,7 @@ export const chatsSlice = createSlice({
               ...x,
               messages: x.messages.map((y) =>
                 y.id === action.payload.msgId
-                  ? { ...y, isLiked: !y.isLiked }
+                  ? { ...y, reaction: action.payload.reaction }
                   : y
               ),
             }
