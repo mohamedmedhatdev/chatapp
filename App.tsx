@@ -8,23 +8,11 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-
-    <Provider store={store}>
-      <BackgroundScreen>
-        <ChatView
-          chatId={0}
-        />
-      </BackgroundScreen>
-    </Provider>
+      <Provider store={store}>
+        <BackgroundScreen>
+          <ChatView chatId={0} />
+        </BackgroundScreen>
+      </Provider>
     </GestureHandlerRootView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "red",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

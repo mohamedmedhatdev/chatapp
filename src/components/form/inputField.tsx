@@ -1,6 +1,5 @@
 import { useController } from "react-hook-form";
 import { TextInput, TextInputProps } from "react-native";
-import { styles } from "../message/message.style";
 
 interface ITextFieldProps extends TextInputProps {
   name: string;

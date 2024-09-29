@@ -2,11 +2,6 @@ import {
   View,
   Keyboard,
   TouchableOpacity,
-  StyleSheet,
-  LayoutChangeEvent,
-  TurboModuleRegistry,
-  TouchableWithoutFeedback,
-  Touchable,
   LayoutRectangle,
 } from "react-native";
 import { Message } from "../message/message";
@@ -27,6 +22,7 @@ import { MessageReplyPrompt } from "./messageReplyPrompt";
 import * as DocumentPicker from "expo-document-picker";
 import { IMessage } from "../../models/message.model";
 import { BlurView } from "expo-blur";
+import { REACTION_BAR_WIDTH } from "../../constants";
 
 interface IChatViewProps {
   chatId: number;
@@ -39,7 +35,6 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
     defaultValues: { search: "" },
   });
   const searchInputValue = form.watch("search");
-  const messagesRefs = useRef<View[]>([]);
 
   /* REDUX DATA CALLS */
   const colors = useSelector((state: RootState) => state.colorsReducer.colors);
@@ -109,6 +104,7 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
       {reactData.react && reactData.layout && (
         <>
           <BlurView
+            experimentalBlurMethod="dimezisBlurView"
             onTouchStart={() => {
               setReactData((r) => ({ ...r, react: false }));
             }}
@@ -116,20 +112,28 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
           />
           <View
             style={{
-              position : "absolute",
-              zIndex : 10,
-              top : reactData.layout.y,
-              padding : 20,
-              width : "100%" 
+              position: "absolute",
+              zIndex: 10,
+              top: reactData.layout.y,
+              paddingHorizontal:
+                reactData.layout.width < REACTION_BAR_WIDTH
+                  ? REACTION_BAR_WIDTH - reactData.layout.width
+                  : 20,
+              width: "100%",
             }}
           >
-            <Message 
-            chat={chat}
-            showReaction
-            onHideReact={() => {setReactData((x) => ({...x,react : false}))}}
-            message={chat.messages.find((x) => x.id === reactData.msgId) ?? chat.messages[0]}
-            onReply={() => {}}
-            onReact={() => {}}
+            <Message
+              chat={chat}
+              showReaction
+              onHideReact={() => {
+                setReactData((x) => ({ ...x, react: false }));
+              }}
+              message={
+                chat.messages.find((x) => x.id === reactData.msgId) ??
+                chat.messages[0]
+              }
+              onReply={() => {}}
+              onReact={() => {}}
             />
           </View>
         </>
@@ -150,6 +154,7 @@ export const ChatView = ({ chatId }: IChatViewProps) => {
           })
           .map((x, i) => (
             <Message
+              onHideReact={() => {}}
               onReact={(layout) => {
                 console.log(layout);
                 setReactData({ msgId: x.id, react: true, layout });

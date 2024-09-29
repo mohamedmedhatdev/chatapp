@@ -1,13 +1,6 @@
-import {
-  LayoutChangeEvent,
-  LayoutRectangle,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewProps,
-} from "react-native";
+import { LayoutRectangle, Text, TouchableOpacity, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { Component, forwardRef, useMemo, useRef, useState } from "react";
+import { useMemo } from "react";
 import { styles } from "./message.style";
 import { IMessage } from "../../models/message.model";
 import { RootState } from "../../store/store";
@@ -15,16 +8,12 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Sharing from "expo-sharing";
 
 import Animated, {
-  AnimateProps,
   BounceIn,
   BounceOut,
-  FadeIn,
   FadeInLeft,
   FadeInRight,
-  FadeOut,
   measure,
   runOnJS,
-  runOnUI,
   useAnimatedRef,
   useAnimatedStyle,
   useSharedValue,
@@ -89,11 +78,18 @@ export const Message = ({
         if (e.translationX > END_POSITION) runOnJS(onReply)();
       }
     });
-  const longPressGesture = Gesture.LongPress()
-    .runOnJS(true)
-    .onStart(() => {
-      if (layout.value) onReact(layout.value);
-    });
+
+  const longPressGesture = Gesture.LongPress().onStart(() => {
+    let res = measure(ref);
+    if (res)
+      layout.value = {
+        width: res?.width,
+        height: res?.height,
+        x: res?.pageX,
+        y: res?.pageY,
+      };
+    if (layout.value) runOnJS(onReact)(layout.value);
+  });
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: position.value }],
@@ -104,19 +100,6 @@ export const Message = ({
       gesture={Gesture.Race(longPressGesture, Gesture.Exclusive(panGesture))}
     >
       <Animated.View
-        onLayout={(e) => {
-          runOnUI(() => {
-            let res = measure(ref);
-            console.log(res);
-            if (res)
-              layout.value = {
-                width: res?.width,
-                height: res?.height,
-                x: res?.pageX,
-                y: res?.pageY,
-              };
-          })();
-        }}
         ref={ref}
         style={[
           styles(isSender, colors).root,
@@ -136,24 +119,8 @@ export const Message = ({
           />
         )}
         {message.baseMsg && (
-          <View
-            style={{
-              borderLeftWidth: 5,
-              borderLeftColor: "yellow",
-              justifyContent: "center",
-              marginBottom: 10,
-              backgroundColor: colors.accentColor,
-              padding: 10,
-              borderRadius: 5,
-            }}
-          >
-            <Text
-              style={{
-                paddingLeft: 10,
-                color: "yellow",
-                fontWeight: "bold",
-              }}
-            >
+          <View style={styles(isSender, colors).baseMsgContainer}>
+            <Text style={styles(isSender, colors).baseMsgTitleText}>
               {message.senderId === authState.user.id
                 ? "You"
                 : chat.recipiant.name}
@@ -174,14 +141,7 @@ export const Message = ({
             onPress={() => {
               Sharing.shareAsync((message.content as any).uri);
             }}
-            style={{
-              width: "100%",
-              height: 60,
-              backgroundColor: colors.inputColor,
-              borderRadius: 10,
-              flexDirection: "row",
-              padding: 10,
-            }}
+            style={styles(isSender, colors).attachment}
           >
             <Ionicons name="file-tray" size={32} color="white" />
             <Text style={{ color: "white", fontSize: 24, marginHorizontal: 5 }}>
@@ -197,18 +157,7 @@ export const Message = ({
           <Animated.View
             entering={BounceIn.duration(300)}
             exiting={BounceOut.duration(300)}
-            style={{
-              position: "absolute",
-              width: 30,
-              height: 30,
-              backgroundColor: colors.barsColor,
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 20,
-              zIndex: 10,
-              bottom: -20,
-              [isSender ? "left" : "right"]: -20,
-            }}
+            style={styles(isSender, colors).reaction}
           >
             <Text>{message.reaction}</Text>
           </Animated.View>
